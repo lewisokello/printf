@@ -2,43 +2,51 @@
 /**
  * _printf - produces output according to a format
  * @format: format string containing the characters and the specifiers
- * Description: this function will call the get_print() function that will
- * determine which printing function to call depending on the conversion
- * specifiers contained into fmt
- * Return: length of the formatted output string
+ * Return: return pointer to index
  */
 int _printf(const char *format, ...)
 {
-int (*pfunc)(va_list, flags_t *);
-const char *p;
-va_list arguments;
-flags_t flags = {0, 0, 0};
-register int count = 0;
-va_start(arguments, format);
-if (!format || (format[0] == '%' && !format[1]))
+char buffer[1024];
+int i, j = 0, a = 0, *index = &a;
+va_list valist;
+vtype_t spec[] = {
+{'c', format_c}, {'d', format_d}, {'s', format_s}, {'i', format_d},
+{'u', format_u}, {'%', format_perc}, {'x', format_h}, {'X', format_ch},
+{'o', format_o}, {'b', format_b}, {'p', format_p}, {'r', format_r},
+{'R', format_R}, {'\0', NULL}
+};
+if (!format)
 return (-1);
-if (format[0] == '%' && format[1] == ' ' && !format[2])
-return (-1);
-for (p = format; *p; p++)
+va_start(valist, format);
+for (i = 0; format[i] != '\0'; i++)
 {
-if (*p == '%')
+for (; format[i] != '%' && format[i] != '\0'; *index += 1, i++)
 {
-p++;
-if (*p == '%')
+if (*index == 1024)
 {
-count += _putchar('%');
-continue;
+_write_buffer(buffer, index);
+reset_buffer(buffer);
+*index = 0;
 }
-while (get_flag(*p, &flags))
-p++;
-pfunc = get_print(*p);
-count += (pfunc)
-? pfunc(arguments, &flags)
-: _printf("%%%c", *p);
-}else
-count += _putchar(*p);
+buffer[*index] = format[i];
 }
-_putchar(-1);
-va_end(arguments);
-return (count);
+if (format[i] == '\0')
+break;
+if (format[i] == '%')
+{
+i++;
+for (j = 0; spec[j].tp != '\0'; j++)
+{
+if (format[i] == spec[j].tp)
+{
+spec[j].f(valist, buffer, index);
+break;
+}
+}
+}
+}
+va_end(valist);
+buffer[*index] = '\0';
+_write_buffer(buffer, index);
+return (*index);
 }
