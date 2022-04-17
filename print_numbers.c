@@ -1,79 +1,117 @@
 #include "main.h"
-
 /**
- * print_i - prints an integer
- * @i: integer to print
+ * print_char - prints a character
+ * @ap: argument pointer
+ * @params: the parameters struct
  *
  * Return: number of chars and digits printed
  */
-int print_i(va_list i)
+int print_char(va_list ap, params_t *params)
 {
-int a[10];
-int j, m, n, sum, count;
-
-n = va_arg(i, int);
-count = 0;
-m = 1000000000;
-a[0] = n / m;
-for (j = 1; j < 10; j++)
-{
-m /= 10;
-a[j] = (n / m) % 10;
+char pad_char = ' ';
+unsigned int pad = 1, sum = 0, ch = va_arg(ap, int);
+if (params->minus_flag)
+sum += _putchar(ch);
+while (pad++ < params->width)
+sum += _putchar(pad_char);
+if (!params->minus_flag)
+sum += _putchar(ch);
+return (sum);
 }
-if (n < 0)
-{
-_putchar('-');
-count++;
-for (j = 0; j < 10; j++)
-a[j] *= -1;
-}
-for (j = 0, sum = 0; j < 10; j++)
-{
-sum += a[j];
-if (sum != 0 || j == 9)
-{
-_putchar('0' + a[j]);
-count++;
-}
-}
-return (count);
-}
-
 /**
- * print_d - prints a decimal
- * @d: decimal to print
- *
- * Return: number of chars and digits printed
+ * print_int - prints integer
+ * @ap: argument pointer
+ * @params: the parameters struct
+ * Return: number chars printed
  */
-int print_d(va_list d)
+int print_int(va_list ap, params_t *params)
 {
-int a[10];
-int j, m, n, sum, count;
-
-n = va_arg(d, int);
-count = 0;
-m = 1000000000;
-a[0] = n / m;
-for (j = 1; j < 10; j++)
-{
-m /= 10;
-a[j] = (n / m) % 10;
+long l;
+if (params->l_modifier)
+l = va_arg(ap, long);
+else if (params->h_modifier)
+l = (short int)va_arg(ap, int);
+else
+l = (int)va_arg(ap, int);
+return (print_number(convert(l, 10, 0, params), params));
 }
-if (n < 0)
+/**
+ * print_string - prints string
+ * @ap: argument pointer
+ * @params: the parameters struct
+ * Return: number chars printed
+ */
+int print_string(va_list ap, params_t *params)
 {
-_putchar('-');
-count++;
-for (j = 0; j < 10; j++)
-a[j] *= -1;
-}
-for (j = 0, sum = 0; j < 10; j++)
+char *str = va_arg(ap, char *), pad_char = ' ';
+unsigned int pad = 0, sum = 0, i = 0, j;
+(void)params;
+switch ((int)(!str))
+case 1:
+str = NULL_STRING;
+j = pad = _strlen(str);
+if (params->precision < pad)
+j = pad = params->precision;
+if (params->minus_flag)
 {
-sum += a[j];
-if (sum != 0 || j == 9)
+if (params->precision != UINT_MAX)
+for (i = 0; i < pad; i++)
+sum += _putchar(*str++);
+else
+sum += _puts(str);
+}
+while (j++ < params->width)
+sum += _putchar(pad_char);
+if (!params->minus_flag)
 {
-_putchar('0' + a[j]);
-count++;
+if (params->precision != UINT_MAX)
+for (i = 0; i < pad; i++)
+sum += _putchar(*str++);
+else
+sum += _puts(str);
+}
+return (sum);
+}
+/**
+ * print_percent - prints string
+ * @ap: argument pointer
+ * @params: the parameters struct
+ * Return: number chars printed
+ */
+int print_percent(va_list ap, params_t *params)
+{
+(void)ap;
+(void)params;
+return (_putchar('%'));
+}
+/**
+ * print_S - custom format specifier
+ * @ap: argument pointer
+ * @params: the parameters struct
+ * Return: number chars printed
+ */
+int print_S(va_list ap, params_t *params)
+{
+char *str = va_arg(ap, char *);
+char *hex;
+int sum = 0;
+if ((int)(!str))
+return (_puts(NULL_STRING));
+for (; *str; str++)
+{
+if ((*str > 0 && *str < 32) || *str >= 127)
+{
+sum += _putchar('\\');
+sum += _putchar('x');
+hex = convert(*str, 16, 0, params);
+if (!hex[1])
+sum += _putchar('0');
+sum += _puts(hex);
+}
+else
+{
+sum += _putchar(*str);
 }
 }
-return (count);
+return (sum);
 }
