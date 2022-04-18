@@ -6,6 +6,20 @@
 #include <unistd.h>
 
 /**
+ * struct flags - struct containing flags to "turn on"
+ * when a flag specifier is passed to _printf()
+ * @plus: flag for the '+' character
+ * @space: flag for the ' ' character
+ * @hash: flag for the '#' character
+ */
+typedef struct flags
+{
+int plus;
+int space;
+int hash;
+}
+flags_t;
+/**
  * struct print - structure for printing various types
  * @t: type to print
  * @f: function to print
@@ -36,6 +50,8 @@ int print_S(va_list S);
 int print_r(va_list r);
 int print_R(va_list R);
 int print_int(va_list arguments, char *buf, unsigned int ibuf);
-int print_reverse(char *s);
-
+int print_rev(va_list l, flags_t *f);
+int print_rot13(va_list l, flags_t *f);
+int print_bigS(va_list l, flags_t *f);
+int get_flag(char s, flags_t *f);
 #endif  /* _MAIN_H */
