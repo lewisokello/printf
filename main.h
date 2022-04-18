@@ -35,5 +35,6 @@ int print_p(va_list p);
 int print_S(va_list S);
 int print_r(va_list r);
 int print_R(va_list R);
+int get_flag(char s, flags_t *f);
 
 #endif  /* _MAIN_H */
