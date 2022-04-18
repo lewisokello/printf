@@ -35,6 +35,8 @@ int print_p(va_list p);
 int print_S(va_list S);
 int print_r(va_list r);
 int print_R(va_list R);
+int print_int(va_list arguments, char *buf, unsigned int ibuf);
+int print_reverse(char *s);
 
 /**
  * struct flags - struct containing flags to "turn on"
